@@ -142,6 +142,7 @@ typedef struct {
     int suppress_char;
     int mode;
     int mode_changed;
+    int done;
     char db_path[MAX_PATH_LENGTH];
     char server_addr[MAX_ADDR_LENGTH];
     int server_port;
@@ -2384,8 +2385,8 @@ void handle_mouse_input() {
     if (exclusive && (px || py)) {
         double mx, my;
         glfwGetCursorPos(g->window, &mx, &my);
-        float m = 0.0025;
-        s->rx += (mx - px) * m;
+        float m = 0.0001;
+        s->rx += (mx - px)* m;
         if (INVERT_MOUSE) {
             s->ry += (my - py) * m;
         }
@@ -2418,6 +2419,7 @@ void handle_movement(double dt) {
         g->ortho = glfwGetKey(g->window, CRAFT_KEY_ORTHO) ? 64 : 0;
         g->fov = glfwGetKey(g->window, CRAFT_KEY_ZOOM) ? 15 : 65;
         if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)) sz--;
+        if (glfwGetKey(g->window, CRAFT_KEY_END)) g->done = 0;
         if (glfwGetKey(g->window, CRAFT_KEY_BACKWARD)) sz++;
         if (glfwGetKey(g->window, CRAFT_KEY_LEFT)) sx--;
         if (glfwGetKey(g->window, CRAFT_KEY_RIGHT)) sx++;
@@ -2727,8 +2729,8 @@ int main(int argc, char **argv) {
     }
 
     // OUTER LOOP //
-    int running = 1;
-    while (running) {
+    g->done = 1;
+    while (g->done) {
         // DATABASE INITIALIZATION //
         if (g->mode == MODE_OFFLINE || USE_CACHE) {
             db_enable();
@@ -2773,7 +2775,7 @@ int main(int argc, char **argv) {
 
         // BEGIN MAIN LOOP //
         double previous = glfwGetTime();
-        while (1) {
+        while (g->done) {
             // WINDOW SIZE AND SCALE //
             g->scale = get_scale_factor();
             glfwGetFramebufferSize(g->window, &g->width, &g->height);
@@ -2919,7 +2921,7 @@ int main(int argc, char **argv) {
                 g->width = pw;
                 g->height = ph;
                 g->ortho = 0;
-                g->fov = 65;
+                g->fov = 90;
 
                 render_sky(&sky_attrib, player, sky_buffer);
                 glClear(GL_DEPTH_BUFFER_BIT);
@@ -2937,7 +2939,7 @@ int main(int argc, char **argv) {
             glfwSwapBuffers(g->window);
             glfwPollEvents();
             if (glfwWindowShouldClose(g->window)) {
-                running = 0;
+                g->done = 0;
                 break;
             }
             if (g->mode_changed) {
