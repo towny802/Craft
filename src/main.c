@@ -2024,7 +2024,7 @@ void parse_command(const char *buffer, int forward) {
     char server_addr[MAX_ADDR_LENGTH];
     int server_port = DEFAULT_PORT;
     char filename[MAX_PATH_LENGTH];
-    int radius, count, xc, yc, zc;
+    int radius, count, xc, yc, zc,blocknum;
     if (sscanf(buffer, "/identity %128s %128s", username, token) == 2) {
         db_auth_set(username, token);
         add_message("Successfully imported identity token!");
@@ -2123,9 +2123,16 @@ void parse_command(const char *buffer, int forward) {
     else if (sscanf(buffer, "/cylinder %d", &radius) == 1) {
         cylinder(&g->block0, &g->block1, radius, 0);
     }
+    else if (sscanf(buffer, "/block %d", &blocknum)  == 1)
+    {
+        if(blocknum>0 && blocknum < 56){
+            g->item_index = blocknum-1;
+        }
+    }
     else if (forward) {
         client_talk(buffer);
     }
+
 }
 
 void on_light() {
