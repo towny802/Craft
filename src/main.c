@@ -2125,7 +2125,7 @@ void parse_command(const char *buffer, int forward) {
     }
     else if (sscanf(buffer, "/block %d", &blocknum)  == 1)
     {
-        if(blocknum>0 && blocknum < 56){
+        if(blocknum>0 && blocknum < 60){
             g->item_index = blocknum-1;
         }
     }
@@ -2391,7 +2391,7 @@ void handle_mouse_input() {
     if (exclusive && (px || py)) {
         double mx, my;
         glfwGetCursorPos(g->window, &mx, &my);
-        float m = 0.0025;
+        float m = 0.001;
         s->rx += (mx - px) * m;
         if (INVERT_MOUSE) {
             s->ry += (my - py) * m;
