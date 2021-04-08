@@ -20,6 +20,11 @@
 #include "util.h"
 #include "world.h"
 
+#include <AL/al.h>
+//#include "al.h"
+#include <AL/alc.h>
+#include <AL/alut.h>
+
 #define MAX_CHUNKS 8192
 #define MAX_PLAYERS 128
 #define WORKERS 4
@@ -142,7 +147,6 @@ typedef struct {
     int suppress_char;
     int mode;
     int mode_changed;
-    int done;
     char db_path[MAX_PATH_LENGTH];
     char server_addr[MAX_ADDR_LENGTH];
     int server_port;
@@ -2385,8 +2389,8 @@ void handle_mouse_input() {
     if (exclusive && (px || py)) {
         double mx, my;
         glfwGetCursorPos(g->window, &mx, &my);
-        float m = 0.0001;
-        s->rx += (mx - px)* m;
+        float m = 0.0025;
+        s->rx += (mx - px) * m;
         if (INVERT_MOUSE) {
             s->ry += (my - py) * m;
         }
@@ -2409,7 +2413,7 @@ void handle_mouse_input() {
     }
 }
 
-void handle_movement(double dt) {
+void handle_movement(double dt, clock_t *walk_timestamp) {
     static float dy = 0;
     State *s = &g->players->state;
     int sz = 0;
@@ -2418,8 +2422,17 @@ void handle_movement(double dt) {
         float m = dt * 1.0;
         g->ortho = glfwGetKey(g->window, CRAFT_KEY_ORTHO) ? 64 : 0;
         g->fov = glfwGetKey(g->window, CRAFT_KEY_ZOOM) ? 15 : 65;
-        if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)) sz--;
-        if (glfwGetKey(g->window, CRAFT_KEY_END)) g->done = 0;
+        if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)){
+            
+            if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
+                //alSourcePlay(walk);
+                system("pkill -CONT play &");
+                *walk_timestamp = clock();
+            }
+            sz--;
+        } else {
+            system("pkill -STOP play &");
+        }
         if (glfwGetKey(g->window, CRAFT_KEY_BACKWARD)) sz++;
         if (glfwGetKey(g->window, CRAFT_KEY_LEFT)) sx--;
         if (glfwGetKey(g->window, CRAFT_KEY_RIGHT)) sx++;
@@ -2586,7 +2599,33 @@ void reset_model() {
 }
 
 int main(int argc, char **argv) {
-    // INITIALIZATION //
+    ALuint ambient_buffer, ambient, walk;
+    ALuint state = AL_TRUE;
+
+    // Initialize the environment
+    //alutInit(0, NULL);
+
+    //alGetError();
+    //ALuint walk_buffer = alutCreateBufferFromFile("step_sound.wav");
+    //Ambient sound prep and play
+    //ambient_buffer = alutCreateBufferFromFile("test.wav");
+    //alGenSources(1, &ambient);
+    //alSourcei(ambient, AL_BUFFER, ambient_buffer);
+    //alSourcei(ambient, AL_LOOPING, AL_TRUE);
+    //alSourcePlay(ambient);
+    //alGetSourcei(ambient, AL_SOURCE_STATE, &state);
+    system("play -q ./test.wav repeat 99999 &");
+    system("play -q ./step_sound.wav repeat 99999 &");
+    system("pkill -STOP play &");
+
+    clock_t walk_timestamp = clock();
+
+    /*//Walk sound prep
+    buffer = alutCreateBufferFromFile("../step_sound.wav");
+    alGenSources(1, &ambient);
+    alSourcei(ambient, AL_BUFFER, buffer);
+    alGetSourcei(ambient, AL_SOURCE_STATE, &state);
+*/
     curl_global_init(CURL_GLOBAL_DEFAULT);
     srand(time(NULL));
     rand();
@@ -2729,8 +2768,8 @@ int main(int argc, char **argv) {
     }
 
     // OUTER LOOP //
-    g->done = 1;
-    while (g->done) {
+    int running = 1;
+    while (running) {
         // DATABASE INITIALIZATION //
         if (g->mode == MODE_OFFLINE || USE_CACHE) {
             db_enable();
@@ -2775,7 +2814,7 @@ int main(int argc, char **argv) {
 
         // BEGIN MAIN LOOP //
         double previous = glfwGetTime();
-        while (g->done) {
+        while (1) {
             // WINDOW SIZE AND SCALE //
             g->scale = get_scale_factor();
             glfwGetFramebufferSize(g->window, &g->width, &g->height);
@@ -2799,7 +2838,7 @@ int main(int argc, char **argv) {
             handle_mouse_input();
 
             // HANDLE MOVEMENT //
-            handle_movement(dt);
+            handle_movement(dt, &walk_timestamp);
 
             // HANDLE DATA FROM SERVER //
             char *buffer = client_recv();
@@ -2921,7 +2960,7 @@ int main(int argc, char **argv) {
                 g->width = pw;
                 g->height = ph;
                 g->ortho = 0;
-                g->fov = 90;
+                g->fov = 65;
 
                 render_sky(&sky_attrib, player, sky_buffer);
                 glClear(GL_DEPTH_BUFFER_BIT);
@@ -2939,7 +2978,7 @@ int main(int argc, char **argv) {
             glfwSwapBuffers(g->window);
             glfwPollEvents();
             if (glfwWindowShouldClose(g->window)) {
-                g->done = 0;
+                running = 0;
                 break;
             }
             if (g->mode_changed) {
