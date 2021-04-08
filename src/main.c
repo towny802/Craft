@@ -2865,11 +2865,13 @@ int main(int argc, char **argv) {
                 hour = hour ? hour : 12;
                 snprintf(
                     text_buffer, 1024,
-                    "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %d%cm %dfps",
+                    "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %dfps",
                     chunked(s->x), chunked(s->z), s->x, s->y, s->z,
                     g->player_count, g->chunk_count,
-                    face_count * 2, hour, am_pm, fps.fps);
+                    face_count * 2, fps.fps);
                 render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		snprintf(text_buffer, 1024,"Game Time: %d%cm",hour, am_pm);
+                render_text(&text_attrib, ALIGN_LEFT, tx, ty-23, ts, text_buffer);
                 ty -= ts * 2;
             }
             if (SHOW_CHAT_TEXT) {
