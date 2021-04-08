@@ -4,7 +4,7 @@
 // app parameters
 #define DEBUG 0
 #define FULLSCREEN 0
-#define WINDOW_WIDTH 1080
+#define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
 #define VSYNC 1
 #define SCROLL_THRESHOLD 0.1
@@ -37,15 +37,11 @@
 #define CRAFT_KEY_OBSERVE_INSET 'P'
 #define CRAFT_KEY_ITEM_NEXT 'E'
 #define CRAFT_KEY_ITEM_PREV 'R'
-#define CRAFT_KEY_ZOOM 'Q'
-#define CRAFT_KEY_SPRINT GLFW_MOD_SHIFT
-#define CRAFT_KEY_END GLFW_KEY_ESCAPE 
+#define CRAFT_KEY_ZOOM GLFW_KEY_LEFT_SHIFT
 #define CRAFT_KEY_ORTHO 'F'
 #define CRAFT_KEY_CHAT 't'
 #define CRAFT_KEY_COMMAND '/'
 #define CRAFT_KEY_SIGN '`'
-
-// controller keys
 
 // advanced parameters
 #define CREATE_CHUNK_RADIUS 10
