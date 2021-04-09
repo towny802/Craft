@@ -2861,7 +2861,7 @@ int main(int argc, char **argv) {
             if (present == 1){
                 int axescount;
                 const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axescount);
-                
+                /* Axes Testing
                 printf("Left axis x: %f\n", axes[0]);
                 printf("Left axis y: %f\n", axes[1]);
                 printf("Left trigger: %f\n", axes[2]);
@@ -2870,7 +2870,7 @@ int main(int argc, char **argv) {
                 printf("Right trigger: %f\n", axes[5]);
                 printf("D-pad axis x: %f\n", axes[6]);
                 printf("D-pad axis y: %f\n", axes[7]);
-                
+                */
 
                int buttoncount;
                const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttoncount);
