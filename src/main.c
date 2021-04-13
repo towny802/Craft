@@ -2029,7 +2029,7 @@ void parse_command(const char *buffer, int forward) {
     char server_addr[MAX_ADDR_LENGTH];
     int server_port = DEFAULT_PORT;
     char filename[MAX_PATH_LENGTH];
-    int radius, count, xc, yc, zc,blocknum;
+    int radius, count, xc, yc, zc;
     if (sscanf(buffer, "/identity %128s %128s", username, token) == 2) {
         db_auth_set(username, token);
         add_message("Successfully imported identity token!");
@@ -2128,16 +2128,9 @@ void parse_command(const char *buffer, int forward) {
     else if (sscanf(buffer, "/cylinder %d", &radius) == 1) {
         cylinder(&g->block0, &g->block1, radius, 0);
     }
-    else if (sscanf(buffer, "/block %d", &blocknum)  == 1)
-    {
-        if(blocknum>0 && blocknum < 60){
-            g->item_index = blocknum-1;
-        }
-    }
     else if (forward) {
         client_talk(buffer);
     }
-
 }
 
 void on_light() {
@@ -2396,14 +2389,8 @@ void handle_mouse_input() {
     if (exclusive && (px || py)) {
         double mx, my;
         glfwGetCursorPos(g->window, &mx, &my);
-<<<<<<< HEAD
         float m = 0.0025;
         s->rx += (mx - px) * m;
-=======
-        float m = 0.001;
-        s->rx += (mx - px) * m;
-
->>>>>>> 7932b62f54d30bfc0fad42072cece972fe0d0da2
         if (INVERT_MOUSE) {
             s->ry += (my - py) * m;
         }

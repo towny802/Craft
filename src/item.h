@@ -57,11 +57,7 @@
 #define COLOR_29 61
 #define COLOR_30 62
 #define COLOR_31 63
-#define BULBASAUR 64
-#define PUMPKIN 65
-#define DIAMOND 66
-#define GOLD 67
-#define OBSIDIAN 68
+
 extern const int items[];
 extern const int item_count;
 extern const int blocks[256][6];
