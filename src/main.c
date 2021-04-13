@@ -2413,7 +2413,7 @@ void handle_mouse_input() {
     }
 }
 
-void handle_movement(double dt, clock_t *walk_timestamp) {
+void handle_movement(double dt, ALuint *walk_buffer, clock_t *walk_timestamp) {
     static float dy = 0;
     State *s = &g->players->state;
     int sz = 0;
@@ -2423,7 +2423,15 @@ void handle_movement(double dt, clock_t *walk_timestamp) {
         g->ortho = glfwGetKey(g->window, CRAFT_KEY_ORTHO) ? 64 : 0;
         g->fov = glfwGetKey(g->window, CRAFT_KEY_ZOOM) ? 15 : 65;
         if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)){
-            
+            ALuint walk;
+            ALuint state = AL_FALSE;
+
+
+            alGetError();
+
+            //buffer = alutCreateBufferFromFile("step_sound.wav");
+            alGenSources(1, &walk);
+            alSourcei(walk, AL_BUFFER, *walk_buffer);
             if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
                 //alSourcePlay(walk);
                 system("pkill -CONT play &");
@@ -2603,18 +2611,17 @@ int main(int argc, char **argv) {
     ALuint state = AL_TRUE;
 
     // Initialize the environment
-    //alutInit(0, NULL);
+    alutInit(0, NULL);
 
-    //alGetError();
-    //ALuint walk_buffer = alutCreateBufferFromFile("step_sound.wav");
+    alGetError();
+    ALuint walk_buffer = alutCreateBufferFromFile("step_sound.wav");
     //Ambient sound prep and play
-    //ambient_buffer = alutCreateBufferFromFile("test.wav");
-    //alGenSources(1, &ambient);
-    //alSourcei(ambient, AL_BUFFER, ambient_buffer);
-    //alSourcei(ambient, AL_LOOPING, AL_TRUE);
-    //alSourcePlay(ambient);
+    ambient_buffer = alutCreateBufferFromFile("test.wav");
+    alGenSources(1, &ambient);
+    alSourcei(ambient, AL_BUFFER, ambient_buffer);
+    alSourcei(ambient, AL_LOOPING, AL_TRUE);
+    alSourcePlay(ambient);
     //alGetSourcei(ambient, AL_SOURCE_STATE, &state);
-    system("play -q ./test.wav repeat 99999 &");
     system("play -q ./step_sound.wav repeat 99999 &");
     system("pkill -STOP play &");
 
@@ -2838,7 +2845,7 @@ int main(int argc, char **argv) {
             handle_mouse_input();
 
             // HANDLE MOVEMENT //
-            handle_movement(dt, &walk_timestamp);
+            handle_movement(dt, &walk_buffer, &walk_timestamp);
 
             // HANDLE DATA FROM SERVER //
             char *buffer = client_recv();
@@ -2998,6 +3005,7 @@ int main(int argc, char **argv) {
         delete_all_players();
     }
 
+    alutExit();
     glfwTerminate();
     curl_global_cleanup();
     return 0;
