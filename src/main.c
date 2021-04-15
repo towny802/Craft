@@ -39,6 +39,8 @@
 #define WORKER_BUSY 1
 #define WORKER_DONE 2
 
+int hideClock = 0;
+
 typedef struct {
     Map map;
     Map lights;
@@ -2427,6 +2429,13 @@ void handle_movement(double dt) {
         if (glfwGetKey(g->window, GLFW_KEY_RIGHT)) s->rx += m;
         if (glfwGetKey(g->window, GLFW_KEY_UP)) s->ry += m;
         if (glfwGetKey(g->window, GLFW_KEY_DOWN)) s->ry -= m;
+	if (glfwGetKey(g->window, CRAFT_KEY_HIDE_CLOCK)) {
+		if (hideClock == 0) {
+			hideClock = 1;
+		} else {
+			hideClock = 0;
+		}
+	}
     }
     float vx, vy, vz;
     get_motion_vector(g->flying, sz, sx, s->rx, s->ry, &vx, &vy, &vz);
@@ -2867,7 +2876,8 @@ int main(int argc, char **argv) {
 		struct tm * timeinfo;
 		time (&rawtime);
 		timeinfo = localtime (&rawtime);
-                snprintf(
+		if (hideClock == 0) {
+		snprintf(
                     text_buffer, 1024,
                     "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %dfps",
                     chunked(s->x), chunked(s->z), s->x, s->y, s->z,
@@ -2878,7 +2888,8 @@ int main(int argc, char **argv) {
 		render_text(&text_attrib, ALIGN_LEFT, tx, ty - 23, ts, text_buffer);
 		snprintf(text_buffer, 1024,"Game Time: %d%cm",hour, am_pm);
                 render_text(&text_attrib, ALIGN_LEFT, tx, ty-46, ts, text_buffer);
-                ty -= ts * 2;
+		}
+		ty -= ts * 2;
             }
             if (SHOW_CHAT_TEXT) {
                 for (int i = 0; i < MAX_MESSAGES; i++) {
