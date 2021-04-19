@@ -2024,7 +2024,8 @@ void parse_command(const char *buffer, int forward) {
     char server_addr[MAX_ADDR_LENGTH];
     int server_port = DEFAULT_PORT;
     char filename[MAX_PATH_LENGTH];
-    int radius, count, xc, yc, zc,blocknum;
+    int radius, count, xc, yc, zc,blocknum, hx,hy,hz;
+    State *s = &g->players->state;
     if (sscanf(buffer, "/identity %128s %128s", username, token) == 2) {
         db_auth_set(username, token);
         add_message("Successfully imported identity token!");
@@ -2129,6 +2130,13 @@ void parse_command(const char *buffer, int forward) {
             g->item_index = blocknum-1;
         }
     }
+    else if (sscanf(buffer, "/spawn") == 0){
+        s->x = 0;
+        s->y = 0;
+        while(!player_intersects_block(2, s->x, s->y, s->z, hx, hy, hz)) {
+            s->z += 1;
+        }
+        }
     else if (forward) {
         client_talk(buffer);
     }
