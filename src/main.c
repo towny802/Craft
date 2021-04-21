@@ -2249,6 +2249,13 @@ void on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
             parse_command(buffer, 0);
         }
     }
+if (glfwGetKey(g->window, CRAFT_KEY_HIDE_CLOCK)) {
+	if (hideClock == 0) {
+		hideClock = 1;
+         } else {
+                hideClock = 0;
+            }
+	}
     if (!g->typing) {
         if (key == CRAFT_KEY_FLY) {
             g->flying = !g->flying;
@@ -2429,13 +2436,6 @@ void handle_movement(double dt) {
         if (glfwGetKey(g->window, GLFW_KEY_RIGHT)) s->rx += m;
         if (glfwGetKey(g->window, GLFW_KEY_UP)) s->ry += m;
         if (glfwGetKey(g->window, GLFW_KEY_DOWN)) s->ry -= m;
-	if (glfwGetKey(g->window, CRAFT_KEY_HIDE_CLOCK)) {
-		if (hideClock == 0) {
-			hideClock = 1;
-		} else {
-			hideClock = 0;
-		}
-	}
     }
     float vx, vy, vz;
     get_motion_vector(g->flying, sz, sx, s->rx, s->ry, &vx, &vy, &vz);
