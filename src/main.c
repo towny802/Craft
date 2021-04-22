@@ -44,6 +44,7 @@
 #define WORKER_DONE 2
 
 int hideClock = 0;
+int helpMenu = 0;
 
 typedef struct {
     Map map;
@@ -2194,6 +2195,13 @@ void on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		hideClock = 0;
          }
     }
+    if (glfwGetKey(g->window, CRAFT_KEY_HIDE_HELP)) {
+	if (helpMenu == 0) {
+		helpMenu = 1;
+         } else {
+		helpMenu = 0;
+         }
+    }
     if (key == GLFW_KEY_BACKSPACE) {
         if (g->typing) {
             int n = strlen(g->typing_buffer);
@@ -2905,6 +2913,26 @@ int main(int argc, char **argv) {
             float ts = 12 * g->scale;
             float tx = ts / 2;
             float ty = g->height - ts;
+	    if (!helpMenu) {
+		float rs = 12 * g->scale;
+            	float rx = g->width - 5;
+            	float ry = g->height - rs;
+		snprintf(text_buffer, 1024, "Press F1 for Help");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+	    } else {
+		float rs = 12 * g->scale;
+            	float rx = g->width / 2;
+            	float ry = g->height * 0.75;
+		snprintf(text_buffer, 1024, "Movement: WASD");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Jump: Space");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Fly: Tab");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+	    }
             if (SHOW_INFO_TEXT) {
                 int hour = time_of_day() * 24;
                 char am_pm = hour < 12 ? 'a' : 'p';
@@ -2914,7 +2942,7 @@ int main(int argc, char **argv) {
 		struct tm * timeinfo;
 		time (&rawtime);
 		timeinfo = localtime (&rawtime);
-		if (hideClock == 0) {
+		if (!hideClock) {
 		snprintf(
                     text_buffer, 1024,
                     "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %dfps",
