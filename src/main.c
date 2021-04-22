@@ -21,7 +21,6 @@
 #include "world.h"
 
 #include <AL/al.h>
-//#include "al.h"
 #include <AL/alc.h>
 #include <AL/alut.h>
 
@@ -2188,6 +2187,13 @@ void on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (action == GLFW_RELEASE) {
         return;
     }
+    if (glfwGetKey(g->window, CRAFT_KEY_HIDE_CLOCK)) {
+	if (hideClock == 0) {
+		hideClock = 1;
+         } else {
+		hideClock = 0;
+         }
+    }
     if (key == GLFW_KEY_BACKSPACE) {
         if (g->typing) {
             int n = strlen(g->typing_buffer);
@@ -2253,13 +2259,6 @@ void on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
             parse_command(buffer, 0);
         }
     }
-if (glfwGetKey(g->window, CRAFT_KEY_HIDE_CLOCK)) {
-	if (hideClock == 0) {
-		hideClock = 1;
-         } else {
-                hideClock = 0;
-            }
-	}
     if (!g->typing) {
         if (key == CRAFT_KEY_FLY) {
             g->flying = !g->flying;
@@ -2923,12 +2922,14 @@ int main(int argc, char **argv) {
                     g->player_count, g->chunk_count,
                     face_count * 2, fps.fps);
                 render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
-		snprintf(text_buffer, 1024, "Local Time: %s", asctime(timeinfo));
-		render_text(&text_attrib, ALIGN_LEFT, tx, ty - 23, ts, text_buffer);
-		snprintf(text_buffer, 1024,"Game Time: %d%cm",hour, am_pm);
-                render_text(&text_attrib, ALIGN_LEFT, tx, ty-46, ts, text_buffer);
-		}
 		ty -= ts * 2;
+		snprintf(text_buffer, 1024, "Local Time: %s", asctime(timeinfo));
+		render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		snprintf(text_buffer, 1024,"Game Time: %d%cm",hour, am_pm);
+		ty -= ts * 2;
+                render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		ty -= ts * 2;
+		}
             }
             if (SHOW_CHAT_TEXT) {
                 for (int i = 0; i < MAX_MESSAGES; i++) {
