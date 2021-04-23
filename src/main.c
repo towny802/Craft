@@ -2909,6 +2909,7 @@ int main(int argc, char **argv) {
             if (SHOW_INFO_TEXT) {
                 int hour = time_of_day() * 24;
                 char am_pm = hour < 12 ? 'a' : 'p';
+		int health = 10;
                 hour = hour % 12;
                 hour = hour ? hour : 12;
 		time_t rawtime;
@@ -2923,11 +2924,16 @@ int main(int argc, char **argv) {
                     g->player_count, g->chunk_count,
                     face_count * 2, fps.fps);
                 render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		ty -= ts * 2;
 		snprintf(text_buffer, 1024, "Local Time: %s", asctime(timeinfo));
-		render_text(&text_attrib, ALIGN_LEFT, tx, ty - 23, ts, text_buffer);
+		render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		ty -= ts * 2;
 		snprintf(text_buffer, 1024,"Game Time: %d%cm",hour, am_pm);
-                render_text(&text_attrib, ALIGN_LEFT, tx, ty-46, ts, text_buffer);
+                render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		ty -= ts * 2;
 		}
+		snprintf(text_buffer, 1024,"HP: %d/10", health);
+                render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
 		ty -= ts * 2;
             }
             if (SHOW_CHAT_TEXT) {
