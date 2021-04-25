@@ -4,29 +4,6 @@ project(craft)
 
 FILE(GLOB SOURCE_FILES src/*.c)
 
-#
-#find_package(OpenAL REQUIRED)
-#include_directories(${ALUT_INCLUDE_DIR})
-#include_directories(${OPENAL_INCLUDE_DIR})
-#target_link_libraries(craft ${ALUT_LIBRARY})
-#target_link_libraries(craft ${OPENAL_LIBRARY})
-#add_definitions("-DHAVE_OPENAL=1")
-
-#arget_link_libraries(/usr/include/AL/alut.h)
-#link_directories(${OPEN})
-#include_directories(${OPENAL_INCLUDE_DIR})
-#target_link_libraries(${OPENAL_LIBRARY})
-#target_link_libraries(craft /usr/local/include/AL/alut.h)
-#et(CMAKE_CXX_COMPILER arm-linux-gnueabihf-g++)
-#set(CMAKE_C_FLAGS " ${CMAKE_C_FLAGS} --libs=freealut")
-#set(GCC_COVERAGE_COMPILE_FLAGS "-lopenal -lm")
-#set(GCC_COVERAGE_LINK_FLAGS "-lopenal -lm")
-#add_compile_options(--libs=freealut)
-#add_definitions(-lopenal -lm)
-
-#add_subdirectory(/usr/include/AL/)
-
-
 add_executable(
     craft
     ${SOURCE_FILES}
@@ -62,7 +39,7 @@ if(APPLE)
 endif()
 
 if(UNIX)
-    target_link_libraries(craft dl glfw 
+    target_link_libraries(craft dl glfw
         ${GLFW_LIBRARIES} ${CURL_LIBRARIES})
 endif()
 
@@ -71,9 +48,3 @@ if(MINGW)
         ${GLFW_LIBRARIES} ${CURL_LIBRARIES})
 endif()
 
-find_package(OpenAL REQUIRED)
-include_directories(${ALUT_INCLUDE_DIR})
-include_directories(${OPENAL_INCLUDE_DIR})
-target_link_libraries(craft ${ALUT_LIBRARY})
-target_link_libraries(craft ${OPENAL_LIBRARY})
-add_definitions("-DHAVE_OPENAL=1")
