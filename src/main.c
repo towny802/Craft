@@ -2423,27 +2423,41 @@ void handle_movement(double dt, ALuint *walk_buffer, clock_t *walk_timestamp) {
         g->ortho = glfwGetKey(g->window, CRAFT_KEY_ORTHO) ? 64 : 0;
         g->fov = glfwGetKey(g->window, CRAFT_KEY_ZOOM) ? 15 : 65;
         if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)){
-            ALuint walk;
-            ALuint state = AL_FALSE;
-
-
-            alGetError();
-
-            //buffer = alutCreateBufferFromFile("step_sound.wav");
-            alGenSources(1, &walk);
-            alSourcei(walk, AL_BUFFER, *walk_buffer);
             if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
-                //alSourcePlay(walk);
-                system("pkill -CONT play &");
+                walkSoundStart();
                 *walk_timestamp = clock();
             }
             sz--;
         } else {
-            system("pkill -STOP play &");
+            walkSoundStop();
         }
-        if (glfwGetKey(g->window, CRAFT_KEY_BACKWARD)) sz++;
-        if (glfwGetKey(g->window, CRAFT_KEY_LEFT)) sx--;
-        if (glfwGetKey(g->window, CRAFT_KEY_RIGHT)) sx++;
+        if (glfwGetKey(g->window, CRAFT_KEY_BACKWARD)) {
+            if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
+                walkSoundStart();
+                *walk_timestamp = clock();
+            }
+            sz++;
+        } else {
+            walkSoundStop();
+        }
+        if (glfwGetKey(g->window, CRAFT_KEY_LEFT)) {
+            if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
+                walkSoundStart();
+                *walk_timestamp = clock();
+            }
+            sx--;
+        } else {
+            walkSoundStop();
+        }
+        if (glfwGetKey(g->window, CRAFT_KEY_RIGHT)) {
+            if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
+                walkSoundStart();
+                *walk_timestamp = clock();
+            }
+            sx++;
+        } else {
+            walkSoundStop();
+        }
         if (glfwGetKey(g->window, GLFW_KEY_LEFT)) s->rx -= m;
         if (glfwGetKey(g->window, GLFW_KEY_RIGHT)) s->rx += m;
         if (glfwGetKey(g->window, GLFW_KEY_UP)) s->ry += m;
