@@ -90,7 +90,7 @@ terminal.
 - Arrow keys emulate mouse movement.
 - Enter emulates mouse click.
 - ESC closes game down.
-- F2 opens in game clock.
+- F3 opens in game clock.
 
 ### Controller Controls (Xbox-One Controller)
 - Left Stick moves character.
