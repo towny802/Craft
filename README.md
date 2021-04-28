@@ -43,6 +43,7 @@ the installation:
     sudo apt-get build-dep glfw
     sudo apt-get install libalut-dev
     sudo apt install libopenal-dev
+    sudo apt install sox
 
 #### Windows
 
