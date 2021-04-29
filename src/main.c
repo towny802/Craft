@@ -2922,7 +2922,7 @@ int main(int argc, char **argv) {
 	    } else {
 		//Left Side
 		float rs = 12 * g->scale;
-            	float rx = g->width / 2;
+            	float rx = (g->width / 2) - 10;
             	float ry = g->height * 0.75;
 		snprintf(text_buffer, 1024, "Movement: W/A/S/D");
 		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
@@ -2954,7 +2954,45 @@ int main(int argc, char **argv) {
 		snprintf(text_buffer, 1024, "Main View: O");
 		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
 		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Open Chat: T");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
 		//Right Side
+		ry = g->height * 0.75;
+		rx = (g->width / 2) + 10;
+		snprintf(text_buffer, 1024, "Start Sign: `");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Start Command: /");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Command List: ");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/goto [Name]: Teleport to [Name]");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/list: List current players");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/login [Name]: Switch to another user");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/logout: Switch to guest user");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/offline [File]: Offline mode with [File] save location");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/online [Host] [Port]: Connect to given server");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/pq [P] [Q]: Teleport to given chunk");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/spawn: Teleport to the spawn point");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
 	    }
             if (SHOW_INFO_TEXT) {
                 int hour = time_of_day() * 24;
