@@ -7,7 +7,7 @@ Minecraft clone for Windows, Mac OS X and Linux. Just a few thousand lines of C 
 
 http://www.michaelfogleman.com/craft/
 
-![Screenshot](http://i.imgur.com/SH7wcas.png)
+![Screenshot](https://i.imgur.com/iGJI8Jn.png)
 
 ### Features
 
@@ -18,6 +18,9 @@ http://www.michaelfogleman.com/craft/
 * Day / night cycles and a textured sky dome.
 * World changes persisted in a sqlite3 database.
 * Multiplayer support!
+* Help Menu
+
+![Screenshot](https://i.imgur.com/6pm0Ael.png)
 
 ### Download
 
