@@ -2920,10 +2920,17 @@ int main(int argc, char **argv) {
 		snprintf(text_buffer, 1024, "Press F1 for Help");
 		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
 	    } else {
+		//Left Side
 		float rs = 12 * g->scale;
             	float rx = g->width / 2;
             	float ry = g->height * 0.75;
-		snprintf(text_buffer, 1024, "Movement: WASD");
+		snprintf(text_buffer, 1024, "Movement: W/A/S/D");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Create Block: Right Click");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Destroy Block: Left Click");
 		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
 		ry -= rs * 2;
 		snprintf(text_buffer, 1024, "Jump: Space");
@@ -2932,6 +2939,22 @@ int main(int argc, char **argv) {
 		snprintf(text_buffer, 1024, "Fly: Tab");
 		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
 		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Zoom: Q");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Next Item: E or Scroll");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Prev Item: R or Scroll");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Orthographic Mode: F");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Main View: O");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		//Right Side
 	    }
             if (SHOW_INFO_TEXT) {
                 int hour = time_of_day() * 24;
