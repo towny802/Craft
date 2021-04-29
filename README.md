@@ -95,6 +95,7 @@ terminal.
 - Enter emulates mouse click.
 - ESC closes game down.
 - F3 opens in game clock.
+- F1 opens in game help menu.
 
 ### Controller Controls (Xbox-One Controller)
 - Left Stick moves character.
