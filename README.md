@@ -7,7 +7,7 @@ Minecraft clone for Windows, Mac OS X and Linux. Just a few thousand lines of C 
 
 Our project used [Fogleman Craft](http://www.michaelfogleman.com/craft/) as our starting point
 
-![Screenshot](http://i.imgur.com/SH7wcas.png)
+![Screenshot](https://i.imgur.com/iGJI8Jn.png)
 
 ### Tasks
 The Breakdown of Tasks to Pull-Requests is in the [Tasks](./Tasks.md)
@@ -24,6 +24,9 @@ The Breakdown of Tasks to Pull-Requests is in the [Tasks](./Tasks.md)
 * Controller input
 * Linux sound libraries
 * In game clock
+* Help Menu
+
+![Screenshot](https://i.imgur.com/6pm0Ael.png)
 
 ### Install Dependencies
 

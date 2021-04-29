@@ -45,6 +45,7 @@
 #define CRAFT_KEY_COMMAND '/'
 #define CRAFT_KEY_SIGN '`'
 #define CRAFT_KEY_HIDE_CLOCK GLFW_KEY_F3
+#define CRAFT_KEY_HIDE_HELP GLFW_KEY_F1
 
 // controller keys
 
