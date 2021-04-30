@@ -11,3 +11,4 @@
 - `Added /spawn which ports player to 0,0 by rileymoore4521` --> Task 16.4
 - `Added more function with controller by DeePeeDuBz` --> Task 18.1
 - `Finalized Controller by DeePeeDuBz` --> Task 18.3
+- `Completion of Tasks 20.1 / 20.2 by Bravo-0-29er` --> Tasks 20.1 & 20.2
