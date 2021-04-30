@@ -20,7 +20,7 @@
 #include "util.h"
 #include "world.h"
 #include <AL/al.h>
-#include "al.h"
+//#include "al.h"
 #include <AL/alc.h>
 #include <AL/alut.h>
 
