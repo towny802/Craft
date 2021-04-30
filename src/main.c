@@ -19,7 +19,10 @@
 #include "tinycthread.h"
 #include "util.h"
 #include "world.h"
-#include <stdio.h>
+#include <AL/al.h>
+#include "al.h"
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 #define MAX_CHUNKS 8192
 #define MAX_PLAYERS 128
