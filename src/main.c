@@ -20,7 +20,6 @@
 #include "util.h"
 #include "world.h"
 #include <stdio.h>
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
@@ -150,6 +149,7 @@ typedef struct {
     int suppress_char;
     int mode;
     int mode_changed;
+    int done;
     char db_path[MAX_PATH_LENGTH];
     char server_addr[MAX_ADDR_LENGTH];
     int server_port;
@@ -2406,8 +2406,8 @@ void handle_mouse_input() {
     if (exclusive && (px || py)) {
         double mx, my;
         glfwGetCursorPos(g->window, &mx, &my);
-        float m = 0.0025;
-        s->rx += (mx - px) * m;
+        float m = 0.0001;
+        s->rx += (mx - px)* m;
         if (INVERT_MOUSE) {
             s->ry += (my - py) * m;
         }
@@ -2430,7 +2430,7 @@ void handle_mouse_input() {
     }
 }
 
-void handle_movement(double dt, clock_t *walk_timestamp) {
+void handle_movement(double dt) {
     static float dy = 0;
     State *s = &g->players->state;
     int sz = 0;
@@ -2439,17 +2439,8 @@ void handle_movement(double dt, clock_t *walk_timestamp) {
         float m = dt * 1.0;
         g->ortho = glfwGetKey(g->window, CRAFT_KEY_ORTHO) ? 64 : 0;
         g->fov = glfwGetKey(g->window, CRAFT_KEY_ZOOM) ? 15 : 65;
-        if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)){
-            
-            if(clock() > (*walk_timestamp+CLOCKS_PER_SEC) ){
-                //alSourcePlay(walk);
-                system("pkill -CONT play &");
-                *walk_timestamp = clock();
-            }
-            sz--;
-        } else {
-            system("pkill -STOP play &");
-        }
+        if (glfwGetKey(g->window, CRAFT_KEY_END)) g->done = 0;
+        if (glfwGetKey(g->window, CRAFT_KEY_FORWARD)) sz--;
         if (glfwGetKey(g->window, CRAFT_KEY_BACKWARD)) sz++;
         if (glfwGetKey(g->window, CRAFT_KEY_LEFT)) sx--;
         if (glfwGetKey(g->window, CRAFT_KEY_RIGHT)) sx++;
@@ -2514,6 +2505,18 @@ void handle_controller_movement(double dt, const float* axes, const unsigned cha
         if (axes[1] > .5) sz++;
         if (axes[0] < -.5) sx--;
         if (axes[0] > .5) sx++;
+        if (axes[5] == 1) on_left_click();
+        if (axes[2] == 1) on_right_click();
+        if (buttons[3]) g->flying = !g->flying;
+        if (buttons[5]) {
+            g->item_index = (g->item_index + 1) % item_count;
+        }
+        if (buttons[4]) {
+            g->item_index--;
+            if (g->item_index < 0) {
+                g->item_index = item_count - 1;
+            }
+        }
     }
     float vx, vy, vz;
     get_motion_vector(g->flying, sz, sx, s->rx, s->ry, &vx, &vy, &vz);
@@ -2673,33 +2676,7 @@ void reset_model() {
 }
 
 int main(int argc, char **argv) {
-    ALuint ambient_buffer, ambient, walk;
-    ALuint state = AL_TRUE;
-
-    // Initialize the environment
-    //alutInit(0, NULL);
-
-    //alGetError();
-    //ALuint walk_buffer = alutCreateBufferFromFile("step_sound.wav");
-    //Ambient sound prep and play
-    //ambient_buffer = alutCreateBufferFromFile("test.wav");
-    //alGenSources(1, &ambient);
-    //alSourcei(ambient, AL_BUFFER, ambient_buffer);
-    //alSourcei(ambient, AL_LOOPING, AL_TRUE);
-    //alSourcePlay(ambient);
-    //alGetSourcei(ambient, AL_SOURCE_STATE, &state);
-    system("play -q ./test.wav repeat 99999 &");
-    system("play -q ./step_sound.wav repeat 99999 &");
-    system("pkill -STOP play &");
-
-    clock_t walk_timestamp = clock();
-
-    /*//Walk sound prep
-    buffer = alutCreateBufferFromFile("../step_sound.wav");
-    alGenSources(1, &ambient);
-    alSourcei(ambient, AL_BUFFER, buffer);
-    alGetSourcei(ambient, AL_SOURCE_STATE, &state);
-*/
+    // INITIALIZATION //
     curl_global_init(CURL_GLOBAL_DEFAULT);
     srand(time(NULL));
     rand();
@@ -2842,8 +2819,8 @@ int main(int argc, char **argv) {
     }
 
     // OUTER LOOP //
-    int running = 1;
-    while (running) {
+    g->done = 1;
+    while (g->done) {
         // DATABASE INITIALIZATION //
         if (g->mode == MODE_OFFLINE || USE_CACHE) {
             db_enable();
@@ -2888,7 +2865,7 @@ int main(int argc, char **argv) {
 
         // BEGIN MAIN LOOP //
         double previous = glfwGetTime();
-        while (1) {
+        while (g->done) {
             // WINDOW SIZE AND SCALE //
             g->scale = get_scale_factor();
             glfwGetFramebufferSize(g->window, &g->width, &g->height);
@@ -2914,9 +2891,10 @@ int main(int argc, char **argv) {
             // HANDLE MOVEMENT //
             int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
             if (present == 1){
-                int axescount;
-                const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axescount);
-                /* Axes Testing
+               int axescount;
+               const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axescount);
+               int buttoncount;
+               /* Axes Testing
                 printf("Left axis x: %f\n", axes[0]);
                 printf("Left axis y: %f\n", axes[1]);
                 printf("Left trigger: %f\n", axes[2]);
@@ -2926,8 +2904,6 @@ int main(int argc, char **argv) {
                 printf("D-pad axis x: %f\n", axes[6]);
                 printf("D-pad axis y: %f\n", axes[7]);
                 */
-
-               int buttoncount;
                const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttoncount);
                /* Button Testing
                printf("A button: %d\n", buttons[0]);
@@ -2941,7 +2917,7 @@ int main(int argc, char **argv) {
                printf("Xbox Button: %d\n", buttons[8]);
                printf("Left stick: %d\n", buttons[9]);
                printf("Right stick: %d\n", buttons[10]);
-               */
+                */
               handle_controller_movement(dt, axes, buttons);
             } else {
             handle_movement(dt);
@@ -3160,7 +3136,7 @@ int main(int argc, char **argv) {
                 g->width = pw;
                 g->height = ph;
                 g->ortho = 0;
-                g->fov = 65;
+                g->fov = 90;
 
                 render_sky(&sky_attrib, player, sky_buffer);
                 glClear(GL_DEPTH_BUFFER_BIT);
@@ -3178,7 +3154,7 @@ int main(int argc, char **argv) {
             glfwSwapBuffers(g->window);
             glfwPollEvents();
             if (glfwWindowShouldClose(g->window)) {
-                running = 0;
+                g->done = 0;
                 break;
             }
             if (g->mode_changed) {
