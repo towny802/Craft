@@ -19,6 +19,7 @@
 #include "tinycthread.h"
 #include "util.h"
 #include "world.h"
+#include <stdio.h>
 
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -2499,6 +2500,63 @@ void handle_movement(double dt, clock_t *walk_timestamp) {
     }
 }
 
+void handle_controller_movement(double dt, const float* axes, const unsigned char* buttons){
+    static float dy = 0;
+    State *s = &g->players->state;
+    int sz = 0;
+    int sx = 0;
+    if (!g->typing) {
+        float m = dt * 1.0;
+        g->ortho = buttons[6] ? 64 : 0;
+        g->fov = buttons[10] ? 15 : 65;
+        if(axes[1] < -.5) sz--;
+        if (buttons[7]) g->done = 0;
+        if (axes[1] > .5) sz++;
+        if (axes[0] < -.5) sx--;
+        if (axes[0] > .5) sx++;
+    }
+    float vx, vy, vz;
+    get_motion_vector(g->flying, sz, sx, s->rx, s->ry, &vx, &vy, &vz);
+    if (!g->typing) {
+        if (buttons[0]) {
+            if (g->flying) {
+                vy = 1;
+            }
+            else if (dy == 0) {
+                dy = 8;
+            }
+        }
+    }
+    float speed = g->flying ? 20 : 5;
+    int estimate = roundf(sqrtf(
+        powf(vx * speed, 2) +
+        powf(vy * speed + ABS(dy) * 2, 2) +
+        powf(vz * speed, 2)) * dt * 8);
+    int step = MAX(8, estimate);
+    float ut = dt / step;
+    vx = vx * ut * speed;
+    vy = vy * ut * speed;
+    vz = vz * ut * speed;
+    for (int i = 0; i < step; i++) {
+        if (g->flying) {
+            dy = 0;
+        }
+        else {
+            dy -= ut * 25;
+            dy = MAX(dy, -250);
+        }
+        s->x += vx;
+        s->y += vy + dy * ut;
+        s->z += vz;
+        if (collide(2, &s->x, &s->y, &s->z)) {
+            dy = 0;
+        }
+    }
+    if (s->y < 0) {
+        s->y = highest_block(s->x, s->z) + 2;
+    }
+}
+
 void parse_buffer(char *buffer) {
     Player *me = g->players;
     State *s = &g->players->state;
@@ -2854,7 +2912,40 @@ int main(int argc, char **argv) {
             handle_mouse_input();
 
             // HANDLE MOVEMENT //
-            handle_movement(dt, &walk_timestamp);
+            int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+            if (present == 1){
+                int axescount;
+                const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axescount);
+                /* Axes Testing
+                printf("Left axis x: %f\n", axes[0]);
+                printf("Left axis y: %f\n", axes[1]);
+                printf("Left trigger: %f\n", axes[2]);
+                printf("Right axis x: %f\n", axes[3]);
+                printf("Right axis y: %f\n", axes[4]);
+                printf("Right trigger: %f\n", axes[5]);
+                printf("D-pad axis x: %f\n", axes[6]);
+                printf("D-pad axis y: %f\n", axes[7]);
+                */
+
+               int buttoncount;
+               const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttoncount);
+               /* Button Testing
+               printf("A button: %d\n", buttons[0]);
+               printf("B button: %d\n", buttons[1]);
+               printf("X button: %d\n", buttons[2]);
+               printf("Y button: %d\n", buttons[3]);
+               printf("Left bumper: %d\n", buttons[4]);
+               printf("Right bumper: %d\n", buttons[5]);
+               printf("Select: %d\n", buttons[6]);
+               printf("Pause: %d\n", buttons[7]);
+               printf("Xbox Button: %d\n", buttons[8]);
+               printf("Left stick: %d\n", buttons[9]);
+               printf("Right stick: %d\n", buttons[10]);
+               */
+              handle_controller_movement(dt, axes, buttons);
+            } else {
+            handle_movement(dt);
+            }
 
             // HANDLE DATA FROM SERVER //
             char *buffer = client_recv();
