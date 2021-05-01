@@ -2491,36 +2491,43 @@ void handle_movement(double dt) {
     }
 }
 
+handle_controller_looking(double dt, const float* axes){
+    State *s = &g->players->state;
+    float m = dt * 1.0;
+    if (axes[3] < -.5) s->rx -= m;
+    if (axes[3] > .5) s->rx += m;
+    if (axes[4] < -.5) s->ry += m;
+    if (axes[4] > .5) s->ry -= m;
+}
+
+handle_controller_input(const float* axes, const unsigned char* buttons){
+    g->ortho = buttons[6] ? 64 : 0;
+    g->fov = buttons[10] ? 15 : 65;
+    if (buttons[7]) g->done = 0;
+    if (axes[5] == 1) on_left_click();
+    if (axes[2] == 1) on_right_click();
+    if (buttons[5]) {
+        g->item_index = (g->item_index + 1) % item_count;
+    }
+    if (buttons[4]) {
+        g->item_index--;
+        if (g->item_index < 0) {
+            g->item_index = item_count - 1;
+        }
+    }
+    if (buttons[3]) g->flying = !g->flying;
+}
 void handle_controller_movement(double dt, const float* axes, const unsigned char* buttons){
     static float dy = 0;
     State *s = &g->players->state;
     int sz = 0;
     int sx = 0;
-    if (!g->typing) {
-        float m = dt * 1.0;
-        g->ortho = buttons[6] ? 64 : 0;
-        g->fov = buttons[10] ? 15 : 65;
         if(axes[1] < -.5) sz--;
-        if (buttons[7]) g->done = 0;
         if (axes[1] > .5) sz++;
         if (axes[0] < -.5) sx--;
         if (axes[0] > .5) sx++;
-        if (axes[5] == 1) on_left_click();
-        if (axes[2] == 1) on_right_click();
-        if (buttons[3]) g->flying = !g->flying;
-        if (buttons[5]) {
-            g->item_index = (g->item_index + 1) % item_count;
-        }
-        if (buttons[4]) {
-            g->item_index--;
-            if (g->item_index < 0) {
-                g->item_index = item_count - 1;
-            }
-        }
-    }
     float vx, vy, vz;
     get_motion_vector(g->flying, sz, sx, s->rx, s->ry, &vx, &vy, &vz);
-    if (!g->typing) {
         if (buttons[0]) {
             if (g->flying) {
                 vy = 1;
@@ -2529,7 +2536,6 @@ void handle_controller_movement(double dt, const float* axes, const unsigned cha
                 dy = 8;
             }
         }
-    }
     float speed = g->flying ? 20 : 5;
     int estimate = roundf(sqrtf(
         powf(vx * speed, 2) +
@@ -2885,10 +2891,8 @@ int main(int argc, char **argv) {
             dt = MAX(dt, 0.0);
             previous = now;
 
-            // HANDLE MOUSE INPUT //
-            handle_mouse_input();
 
-            // HANDLE MOVEMENT //
+            
             int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
             if (present == 1){
                int axescount;
@@ -2918,8 +2922,13 @@ int main(int argc, char **argv) {
                printf("Left stick: %d\n", buttons[9]);
                printf("Right stick: %d\n", buttons[10]);
                 */
+               handle_controller_looking(dt, axes);
+              handle_controller_input(axes, buttons);
               handle_controller_movement(dt, axes, buttons);
             } else {
+            // HANDLE MOUSE INPUT //
+            handle_mouse_input();
+            // HANDLE KEYBOARD MOVEMENT //
             handle_movement(dt);
             }
 
