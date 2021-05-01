@@ -20,6 +20,9 @@
 #include "util.h"
 #include "world.h"
 #include <stdio.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 #define MAX_CHUNKS 8192
 #define MAX_PLAYERS 128
@@ -39,6 +42,9 @@
 #define WORKER_IDLE 0
 #define WORKER_BUSY 1
 #define WORKER_DONE 2
+
+int hideClock = 0;
+int helpMenu = 0;
 
 typedef struct {
     Map map;
@@ -2183,6 +2189,20 @@ void on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (action == GLFW_RELEASE) {
         return;
     }
+    if (glfwGetKey(g->window, CRAFT_KEY_HIDE_CLOCK)) {
+	if (hideClock == 0) {
+		hideClock = 1;
+         } else {
+		hideClock = 0;
+         }
+    }
+    if (glfwGetKey(g->window, CRAFT_KEY_HIDE_HELP)) {
+	if (helpMenu == 0) {
+		helpMenu = 1;
+         } else {
+		helpMenu = 0;
+         }
+    }
     if (key == GLFW_KEY_BACKSPACE) {
         if (g->typing) {
             int n = strlen(g->typing_buffer);
@@ -2871,9 +2891,8 @@ int main(int argc, char **argv) {
             // HANDLE MOVEMENT //
             int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
             if (present == 1){
-                int axescount;
-
-                const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axescount);
+               int axescount;
+               const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axescount);
                int buttoncount;
                /* Axes Testing
                 printf("Left axis x: %f\n", axes[0]);
@@ -2961,19 +2980,112 @@ int main(int argc, char **argv) {
             float ts = 12 * g->scale;
             float tx = ts / 2;
             float ty = g->height - ts;
+	    if (!helpMenu) {
+		float rs = 12 * g->scale;
+            	float rx = g->width - 5;
+            	float ry = g->height - rs;
+		snprintf(text_buffer, 1024, "Press F1 for Help");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+	    } else {
+		//Left Side
+		float rs = 12 * g->scale;
+            	float rx = (g->width / 2) - 10;
+            	float ry = g->height * 0.75;
+		snprintf(text_buffer, 1024, "Movement: W/A/S/D");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Create Block: Right Click");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Destroy Block: Left Click");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Jump: Space");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Fly: Tab");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Zoom: Q");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Next Item: E or Scroll");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Prev Item: R or Scroll");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Orthographic Mode: F");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Main View: O");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Open Chat: T");
+		render_text(&text_attrib, ALIGN_RIGHT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		//Right Side
+		ry = g->height * 0.75;
+		rx = (g->width / 2) + 10;
+		snprintf(text_buffer, 1024, "Start Sign: `");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Start Command: /");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "Command List: ");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/goto [Name]: Teleport to [Name]");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/list: List current players");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/login [Name]: Switch to another user");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/logout: Switch to guest user");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/offline [File]: Offline mode with [File] save location");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/online [Host] [Port]: Connect to given server");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/pq [P] [Q]: Teleport to given chunk");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+		snprintf(text_buffer, 1024, "/spawn: Teleport to the spawn point");
+		render_text(&text_attrib, ALIGN_LEFT, rx, ry, rs, text_buffer);
+		ry -= rs * 2;
+	    }
             if (SHOW_INFO_TEXT) {
                 int hour = time_of_day() * 24;
                 char am_pm = hour < 12 ? 'a' : 'p';
                 hour = hour % 12;
                 hour = hour ? hour : 12;
-                snprintf(
+		time_t rawtime;
+		struct tm * timeinfo;
+		time (&rawtime);
+		timeinfo = localtime (&rawtime);
+		if (!hideClock) {
+		snprintf(
                     text_buffer, 1024,
-                    "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %d%cm %dfps",
+                    "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %dfps",
                     chunked(s->x), chunked(s->z), s->x, s->y, s->z,
                     g->player_count, g->chunk_count,
-                    face_count * 2, hour, am_pm, fps.fps);
+                    face_count * 2, fps.fps);
                 render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
-                ty -= ts * 2;
+		ty -= ts * 2;
+		snprintf(text_buffer, 1024, "Local Time: %s", asctime(timeinfo));
+		render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		snprintf(text_buffer, 1024,"Game Time: %d%cm",hour, am_pm);
+		ty -= ts * 2;
+                render_text(&text_attrib, ALIGN_LEFT, tx, ty, ts, text_buffer);
+		ty -= ts * 2;
+		}
             }
             if (SHOW_CHAT_TEXT) {
                 for (int i = 0; i < MAX_MESSAGES; i++) {
